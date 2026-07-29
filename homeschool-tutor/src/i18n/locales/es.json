@@ -183,7 +183,21 @@
     "noteForBedePlaceholder": "p. ej. Enfócate en las tablas de multiplicar del 6 al 9 hoy.",
     "stageDescGrammar": "Etapa de gramática",
     "stageDescLogic": "Etapa de lógica",
-    "stageDescRhetoric": "Etapa de retórica"
+    "stageDescRhetoric": "Etapa de retórica",
+    "resumeTitle": "Retomar donde lo dejamos",
+    "resumeHelp": "Dile a Bede dónde se detuvo la lección la última vez. Bede abrirá esa materia justo donde la dejaron: sin preguntar «¿en qué estaban trabajando?» ni empezar la lección de nuevo.",
+    "resumeAdd": "Añadir una lección para retomar",
+    "resumeChooseSubject": "Elige una materia…",
+    "resumeDate": "Fecha de esa lección",
+    "resumeRemove": "Quitar esta nota",
+    "resumeStoppedAt": "Dónde nos detuvimos",
+    "resumeStoppedAtPlaceholder": "p. ej. Leímos hasta el final del capítulo 4: Cristiano acaba de llegar al Palacio Hermoso.",
+    "resumeNextStep": "Continúa aquí (opcional)",
+    "resumeNextStepPlaceholder": "p. ej. Capítulo 5 y luego narrarlo",
+    "resumeStickingPoint": "Qué le costó (opcional)",
+    "resumeStickingPointPlaceholder": "p. ej. Seguía confundiendo a los dos hermanos",
+    "resumeSubjectNotScheduled": "Esta materia no está seleccionada arriba, así que la nota no se usará. Selecciónala o quita esta nota.",
+    "resumeOnlyChosenSubjects": "Solo se pueden retomar las materias que elegiste arriba: Bede no abordará un tema fuera de ellas."
   },
   "progress": {
     "advance": "Avanzar",

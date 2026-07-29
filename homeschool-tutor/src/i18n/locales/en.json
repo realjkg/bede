@@ -183,7 +183,21 @@
     "noteForBedePlaceholder": "e.g. Focus on multiplication facts 6–9 today.",
     "stageDescGrammar": "Grammar Stage",
     "stageDescLogic": "Logic Stage",
-    "stageDescRhetoric": "Rhetoric Stage"
+    "stageDescRhetoric": "Rhetoric Stage",
+    "resumeTitle": "Pick up where we left off",
+    "resumeHelp": "Tell Bede where a lesson stopped last time. Bede opens that subject right where you left it — no “what were you working on?”, no starting the lesson over.",
+    "resumeAdd": "Add a lesson to resume",
+    "resumeChooseSubject": "Choose a subject…",
+    "resumeDate": "Date of that lesson",
+    "resumeRemove": "Remove this note",
+    "resumeStoppedAt": "Where we stopped",
+    "resumeStoppedAtPlaceholder": "e.g. We read to the end of chapter 4 — Christian has just reached the Palace Beautiful.",
+    "resumeNextStep": "Take it up here (optional)",
+    "resumeNextStepPlaceholder": "e.g. Chapter 5, then narrate it",
+    "resumeStickingPoint": "What was hard (optional)",
+    "resumeStickingPointPlaceholder": "e.g. Kept mixing up the two brothers",
+    "resumeSubjectNotScheduled": "This subject isn’t selected above, so the note won’t be used. Select it, or remove this note.",
+    "resumeOnlyChosenSubjects": "Only the subjects you chose above can be resumed — Bede won’t take up a topic outside them."
   },
   "progress": {
     "advance": "Advance",

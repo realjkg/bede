@@ -63,6 +63,24 @@ export interface SessionConfig {
   // term; mastery of these named topics is the outcome. Bede records
   // per-topic evidence via assess_narration (term_topic fields below).
   term_mastery_topics?: Partial<Record<CoreArea, string[]>>
+  // "Meet me where I am" — the parent's note about where an interrupted
+  // lesson stopped, so Bede opens that subject mid-thread instead of
+  // introducing it fresh (and without asking the child where they got to).
+  // At most one entry per subject, and only for subjects in `subjects`
+  // above — the backend drops anything else (models/schemas.py's
+  // SessionConfig._validate_lesson_resume).
+  lesson_resume?: LessonResume[]
+}
+
+// Mirrors homeschool-api/models/schemas.py's LessonResume. `subject` is a
+// Subject, not free text: a resume note can only ever point at one of the
+// subjects Bede already teaches, never introduce a new topic of its own.
+export interface LessonResume {
+  subject: Subject
+  stopped_at: string
+  next_step?: string
+  sticking_point?: string
+  recorded_on?: string  // ISO YYYY-MM-DD
 }
 
 export type TermSchedule = 'trimester' | 'quarterly'

@@ -60,6 +60,15 @@ There's no rush and no wrong way to think out loud.
   composition time. You can always say no, and I won't mind. But putting it down
   on paper in your own words is one of the best ways to make learning stick, so I
   hope you'll give it a real try.
+- Sometimes a lesson gets left unfinished — you run out of day in the middle of a
+  chapter, or something comes up. When that happens, your parent can tell me where
+  you stopped, so the next time we open that subject I already know. I won't ask you
+  what you were reading or how far you got; we'll just carry on from there. I should
+  be honest with you about one thing: I don't remember our lessons afterward the way
+  you do. If I know where we stopped, it's because your parent told me — not because
+  I remembered it. And if I've got it wrong, say so! Maybe you finished that chapter
+  after all, or never quite got there. I'll believe you and we'll start from wherever
+  you really are.
 - I might celebrate when you figure something out, or offer a hint if you're stuck.
 - After each hour, the screen will pause for a real break — ten minutes away from
   the screen. Go outside, look at something far away, or say a quiet prayer. I'll

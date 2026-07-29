@@ -139,8 +139,69 @@ Nothing said there is ever saved — no transcript, no student record. Leave
    with attention challenges especially), turn the lock on: the palette
    disappears from their sessions entirely. You can still open a session
    yourself as the parent, set a look you both like, and leave it locked.
-7. Save, then from the **Pod Dashboard**, enroll each child's voice: they'll record
+7. Fill in **Pick up where we left off** for any lesson that got interrupted —
+   see the section below. Skip it for a subject that's starting fresh.
+8. Save, then from the **Pod Dashboard**, enroll each child's voice: they'll record
    the passphrase three times. This only needs to happen once per child.
+
+**Setup opens on the plan you saved last time.** You don't rebuild the pod from a
+blank page every morning. When you log in as a parent, Setup loads each student
+exactly as you last saved them — subjects, term topics, session length, notes and
+all — so a normal school day is a matter of adjusting the one or two things that
+changed and saving again.
+
+**Picking up an interrupted lesson: "meet me where I am."** Life interrupts
+lessons. A chapter ends halfway, a math page gets abandoned when a sibling needs
+something, a day just runs out. Without being told, Bede would open that subject
+the next morning as though it were brand new — introducing it, then spending your
+child's first few minutes asking where they got to and what they remember. That's
+the seam this removes.
+
+On each student's card there's a **Pick up where we left off** panel. Add a note
+for each subject that needs one:
+
+- **Subject** — chosen from the subjects you've selected for that student, and
+  nothing else. There's deliberately no free-text topic box: a resume note can
+  only ever point at one of the ten subjects Bede teaches, so it can't be used to
+  introduce material that isn't already part of the curriculum. (If you pick a
+  subject and later remove it from the student's list, the panel warns you and the
+  note is simply not used.)
+- **Where we stopped** — the one thing Bede genuinely needs. Write it the way
+  you'd tell a tutor stepping in for you: *"We read to the end of chapter 4 —
+  Christian has just reached the Palace Beautiful."* Be specific; a vague note
+  produces a vague opening.
+- **Take it up here** *(optional)* — what you want done next, if you have
+  something particular in mind: *"Chapter 5, then a written narration."* Leave it
+  blank and Bede chooses the next step himself.
+- **What was hard** *(optional)* — where your child struggled last time: *"Kept
+  mixing up Christian and Faithful."* Bede will slow down there instead of
+  rediscovering the difficulty from scratch.
+- **Date** *(optional)* — the day of the lesson you're resuming, so Bede can tell
+  a thread picked up this morning from one dropped three weeks ago.
+
+You can add one note per subject. Once saved, that subject opens mid-thread: Bede
+names where you left off in a sentence and goes straight to his first real
+question. He won't ask your child what they were reading or how far they got —
+you've already told him.
+
+Three things worth knowing about how Bede treats these notes:
+
+- **He's honest about where the note came from.** If it comes up, Bede will say
+  plainly that you told him where they stopped. He won't pretend to remember the
+  lesson himself — he wasn't there, and he keeps no memory of past sessions.
+- **Your child's own account wins.** If your child says they already finished that
+  chapter, or never got that far, Bede believes them, adjusts, and carries on from
+  where they actually are — without arguing and without putting your child in the
+  middle of a disagreement with you.
+- **A note is context, not a command.** Your notes shape the lesson — you're the
+  curriculum director — but they can't change how Bede teaches. Anything in a note
+  that reads as an instruction to set a rule aside, hand over answers, or be
+  someone other than Bede is ignored, and the lesson goes on. Nothing you type
+  here can override Bede's constitution.
+
+Notes stay saved until you change them, so it's worth clearing or updating one
+when the lesson actually moves on — otherwise Bede will keep resuming from the
+same place.
 
 **The language choice lives on the login screen, not on a student's profile.**
 Once you've set `LOCALE` (step 4 above), everyone who logs in — you or any of

@@ -95,7 +95,7 @@ core/
 routers/
   auth.py            POST /auth/login → JWT (embeds a `locale` claim chosen at the login screen itself — see docs/LOCALIZATION.md); GET /auth/validate; GET /auth/locales (public — which locale, if any, this deployment offers as a login-time toggle)
   tutor.py           POST /tutor/chat (SSE stream); POST /tutor/summary
-  pod.py             CRUD /pod/configs — parent saves, child loads by name; DELETE now cascades through services/student_deletion.py to remove ALL of that student's data (narration, learner profile, mastery, transcripts, voice, usage), not just the day's config — see docs/DATA_RETENTION.md
+  pod.py             CRUD /pod/configs — parent saves, child loads by name (GET /pod/configs also rehydrates the Setup page so a returning parent edits their saved plan instead of a blank form); DELETE now cascades through services/student_deletion.py to remove ALL of that student's data (narration, learner profile, mastery, transcripts, voice, usage), not just the day's config — see docs/DATA_RETENTION.md
   voice.py           POST /voice/enroll; POST /voice/verify
   admin.py           GET /admin/status; GET /admin/audit
   narration.py       Narration assessment history + learner profile: GET/POST /narration/{student}/profile, GET /narration/{student}/assessments, GET /narration/{student}/behavior-check (parent-only processing_style-adaptation observation for TRACKABLE_STYLES — see LearnerBehaviorCheck)
@@ -106,8 +106,30 @@ services/
   transcription.py   Whisper transcription for voice enrollment phrases
   student_deletion.py  delete_all_student_data() — cascading deletion across every per-student table, called from routers/pod.py's DELETE /pod/configs/{student} (see docs/DATA_RETENTION.md)
 models/
-  schemas.py         Pydantic models: SessionConfig, Subject, TutorRequest, etc.
+  schemas.py         Pydantic models: SessionConfig, Subject, TutorRequest, LessonResume, etc.
 ```
+
+**Resuming an interrupted lesson ("meet me where I am"):**
+`SessionConfig.lesson_resume` is a list of `LessonResume` entries — the
+parent's note of where a subject's last lesson actually stopped
+(`stopped_at`, plus optional `next_step`, `sticking_point`, `recorded_on`),
+at most one per subject. `LessonResume.subject` is a `Subject` enum member,
+not free text, and `SessionConfig._validate_lesson_resume` drops any entry
+for a subject not scheduled for that student today: a resume note can only
+ever point at one of the ten subjects Bede already teaches, so it is
+structurally incapable of introducing a topic outside the curriculum.
+`services/ai_service.py`'s `_lesson_resume_note()` renders the matching
+entry into that subject's prompt block (`_build_subject_prompt`, uncached)
+as `<lesson_resume>`: every field runs through `_sanitize_parent_field`
+first, and the block tells Bede to open mid-thread rather than reintroduce
+the subject, to never interview the child about where they got to (the
+whole point — it removes that seam), to be honest that the parent supplied
+the note rather than claim a memory of past sessions it doesn't have
+(non-negotiable rule 1), to keep the resumed work inside that subject, to
+believe the child over the note when they disagree, and to treat the note
+as context under `<ethical_boundaries>` 15 that never outranks the
+constitution or the sacred rules. A note whose required field sanitizes to
+nothing is dropped entirely and the subject opens fresh.
 
 **AI service pattern:** Two-block system prompt with prompt caching. The static block (`_build_static_prompt`) carries Bede's persona and rules and is marked `cache_control: ephemeral` — it's reused across turns. The subject block (`_build_subject_prompt`) changes per subject and is sent fresh. Tools block is also cached. The `[START]` sentinel triggers Bede's subject opener without showing a user bubble. Morning Time's subject block also layers in two verbatim-text catalogs that rotate weekly off the calendar (ISO week number, offset by `config.current_term` so families/demo visitors don't all land on the same entry the same week) rather than off any parent-set field: `services/poetry_catalog.py` (Catholic poetry/hymn-texts, grade-tagged, also shown in Living Books — English-locale sessions only) and `services/prayer_catalog.py` (traditional Catholic prayers — English or Spanish per the session's own login-time locale, Morning Time only; see docs/LOCALIZATION.md — not a global `settings.locale` read, it's threaded through as a parameter from the JWT the request authenticated with). Both give Bede a fixed, pre-reviewed text to quote VERBATIM instead of improvising from memory, since long devotional/poetic passages are exactly what a model can subtly misquote. A non-English session gets `_native_poetry_note` in poetry's place instead (same file, wired into `_build_subject_prompt` for Morning Time/Living Books whenever `locale != "en"`): Bede composes a short original reflection or verse rather than quoting a real poet's work in a language no catalog entry covers — see docs/LOCALIZATION.md's poetry co-study section for why quoting was replaced rather than translated. This is distinct from sacred_rule #10's own daily opening/closing prayer, which stays freshly worded and personal to that day rather than a fixed recitation. `_guadalupe_note` (also in `services/ai_service.py`, wired into `_build_subject_prompt` for `Subject.saints`/`Subject.morning_time` only) is prose guidance, not verbatim stored text: when `locale == "es"` it gives Bede verified facts about Our Lady of Guadalupe and St. Juan Diego, since the app's single Spanish locale is deliberately framed as Mexican rather than pan-Hispanic-neutral — see docs/LOCALIZATION.md's "`es` is Mexican Spanish, not pan-Hispanic-neutral" section for the full scope rationale.
 
@@ -125,7 +147,7 @@ guards/
   AppShell.tsx       Token validation on mount + inactivity timeout (30 min) — sets ready:true before rendering
 pages/
   Login.tsx          Parent password / child PIN tabs; voice-verify phase if voice_required
-  ParentSetup.tsx    Configure up to 10 students per pod with subject/grade/context
+  ParentSetup.tsx    Configure up to 10 students per pod with subject/grade/context; hydrates from GET /pod/configs on mount (guarded so an in-flight load never clobbers typing), and carries the per-subject "Pick up where we left off" editor (SessionConfig.lesson_resume — subject picker only offers that student's own selected subjects)
   PodDashboard.tsx   Per-student "Open on This Device" + "Copy Link for Tablet" + "Delete all data…" (type-to-confirm modal, calls the cascading DELETE — see docs/DATA_RETENTION.md)
   TutorSession.tsx   Main session view — timer, subject sidebar, chat, break overlay
   Progress.tsx       Parent-only: narration history, learner profile (+ behavior-check observation for kinesthetic/reading_writing/visual profiles), math mastery summary, AI usage — non-exhaustive, see the page itself

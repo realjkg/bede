@@ -102,6 +102,42 @@ class ChatMessage(BaseModel):
     content: str
 
 
+class LessonResume(BaseModel):
+    """
+    One subject's "pick up where we left off" note, written by the parent
+    before the day's session — the curriculum director telling Bede exactly
+    where they and the child stopped, so the subject resumes mid-thread
+    instead of opening as though the material were new.
+
+    `subject` is a Subject enum member, which is the whole enforcement of
+    "if it isn't a subject Bede teaches, it can't be introduced": a note can
+    only ever attach to one of the ten subjects in the curriculum, never to
+    an arbitrary parent-invented topic. SessionConfig's validator narrows
+    that further to subjects actually scheduled for this student today.
+
+    The free-text fields are parent-supplied context, so they take the same
+    route every other parent field does — services/ai_service.py's
+    _sanitize_parent_field (HTML, injection phrasing, credential shapes) on
+    the way into the prompt, and no authority over Bede's rules once there
+    (see _lesson_resume_note).
+    """
+    subject: Subject
+    # Where the last lesson actually stopped — the one required field; a
+    # resume note with nothing to resume from is just noise in the prompt.
+    stopped_at: str = Field(..., min_length=1, max_length=300)
+    # What the parent wants taken up next, if they have something specific
+    # in mind. Left unset, Bede decides the next step itself.
+    next_step: Optional[str] = Field(default=None, max_length=300)
+    # Where the child struggled last time, so Bede can slow down there
+    # rather than rediscovering the difficulty from scratch.
+    sticking_point: Optional[str] = Field(default=None, max_length=300)
+    # ISO date (YYYY-MM-DD) of the lesson being resumed, so Bede can tell a
+    # thread picked up this morning from one dropped three weeks ago. Kept a
+    # string rather than a date so config dicts stay JSON-serializable for
+    # encrypt_json (core/encryption.py).
+    recorded_on: Optional[str] = Field(default=None, max_length=10)
+
+
 SUBJECT_CORE_AREAS.update({
     Subject.language_arts: ["phonics_language", "writing_composition"],
     Subject.mathematics:   ["mathematics"],
@@ -185,6 +221,13 @@ class SessionConfig(BaseModel):
     # assess_narration's term_topic fields.
     term_mastery_topics: dict[str, list[str]] = Field(default_factory=dict)
 
+    # ── "Meet me where I am" — resuming an interrupted lesson ─────────────
+    # At most one note per subject (later duplicates win; see the validator),
+    # and only for subjects actually scheduled for this student today —
+    # anything else is dropped rather than rejected, so a parent trimming
+    # today's subject list never gets a save error over a stale note.
+    lesson_resume: List[LessonResume] = Field(default_factory=list, max_length=len(Subject))
+
     @model_validator(mode="after")
     def _validate_term(self):
         max_term = 3 if self.term_schedule == TermSchedule.trimester else 4
@@ -198,6 +241,24 @@ class SessionConfig(BaseModel):
             if kept:
                 cleaned[area] = kept
         self.term_mastery_topics = cleaned
+        return self
+
+    @model_validator(mode="after")
+    def _validate_lesson_resume(self):
+        """One resume note per scheduled subject.
+
+        A note for a subject the child isn't doing today can only confuse
+        Bede's opener (it would never be read) or, worse, smuggle context
+        into a subject the parent has since dropped — so those are filtered
+        out here rather than trusted from the client. Duplicates collapse to
+        the last one given, which is what a form that appends edits produces.
+        """
+        scheduled = set(self.subjects)
+        by_subject: dict[Subject, LessonResume] = {}
+        for entry in self.lesson_resume:
+            if entry.subject in scheduled:
+                by_subject[entry.subject] = entry
+        self.lesson_resume = list(by_subject.values())
         return self
 
 
