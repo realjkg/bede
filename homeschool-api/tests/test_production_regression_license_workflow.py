@@ -54,6 +54,19 @@ def test_every_license_using_job_mints_its_own_key_before_using_it():
         assert generator < block.index(first_consumer), job
 
 
+def test_full_stack_job_replaces_the_wizard_artifact_license():
+    block = _job_block("full-stack-boot")
+    artifact = block.index("uses: actions/download-artifact@")
+    replacement = block.index("name: Use the full-stack job's signed license")
+    start = block.index("name: Start the full stack (as the wizard configured it)")
+
+    assert artifact < replacement < start
+    handoff = block[replacement:start]
+    assert "CI_TEST_LICENSE_KEY" in handoff
+    assert 'line.startswith("LICENSE_KEY=")' in handoff
+    assert "len(license_lines) != 1" in handoff
+
+
 def test_the_guard_would_fail_if_a_job_used_the_license_before_generating_it():
     reconstructed = """
 jobs:
