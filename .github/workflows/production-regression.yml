@@ -341,6 +341,22 @@ jobs:
         with:
           name: wizard-generated-env
 
+      - name: Use the full-stack job's signed license
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          env_path = Path(".env")
+          lines = env_path.read_text(encoding="utf-8").splitlines()
+          license_lines = [i for i, line in enumerate(lines) if line.startswith("LICENSE_KEY=")]
+          if len(license_lines) != 1:
+              raise SystemExit(f"expected one LICENSE_KEY in .env, found {len(license_lines)}")
+          lines[license_lines[0]] = f"LICENSE_KEY={os.environ['CI_TEST_LICENSE_KEY']}"
+          env_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+          env_path.chmod(0o600)
+          PY
+
       - name: Start the full stack (as the wizard configured it)
         run: docker compose up -d --build
 
