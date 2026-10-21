@@ -146,6 +146,7 @@ const report = {
   requests: [],
   diagnosticsBuffer: [],
   pictureStudy: null,
+  entryPage: null,
 };
 
 function finish(code) {
@@ -287,7 +288,9 @@ try {
   // Dismissed by clicking it rather than by pre-seeding localStorage,
   // deliberately: consent is part of the real journey, and a check that
   // skips it would stop noticing if that screen ever broke.
-  const consent = page.getByRole('button', { name: /I understand and agree/i }).first();
+  // Wait for client hydration rather than racing the initial HTML and React mount.
+  // The control is translated, so cover both supported login languages.
+  const consent = page.getByRole('button', { name: /I understand and agree|Entiendo y acepto/i }).first();
   if (await consent.isVisible().catch(() => false)) {
     await consent.click();
     await consent.waitFor({ state: 'hidden', timeout: 15_000 }).catch(() => {});
@@ -297,10 +300,21 @@ try {
   // Matched by role/text rather than a CSS class so a styling change does
   // not produce a false alarm — this check must fail for real reasons only,
   // or it will be ignored, which is worse than not having it.
-  const button = page.getByRole('button', { name: /generate my code/i }).first();
-  await button.waitFor({ state: 'visible', timeout: 30_000 }).catch(() => {
+  const button = page.getByRole('button', { name: /generate my code|generar mi código/i }).first();
+  await button.waitFor({ state: 'visible', timeout: 30_000 }).catch(async () => {
     report.failedStep = 'find-button';
-    report.summary = 'The "Generate my code" button never appeared — the app may not have mounted.';
+    // A 200 from the hosting platform is not evidence that the expected demo
+    // app loaded. Record real page identity to distinguish stale/deployed wrong
+    // content from a JavaScript mounting failure.
+    report.entryPage = await page.evaluate(() => ({
+      title: document.title.slice(0, 200),
+      url: location.href,
+      headings: [...document.querySelectorAll('h1,h2')].slice(0, 6).map(el => (el.textContent || '').trim().slice(0, 120)),
+      visibleText: (document.body?.innerText || '').slice(0, 900),
+      scripts: [...document.scripts].map(s => s.src).filter(Boolean).slice(0, 8),
+    })).catch(() => ({ url: page.url(), title: 'unable to inspect page DOM' }));
+    report.summary = 'The expected demo entry button did not appear. Inspect entryPage: this may be a different deployment, a blocked React bundle, or a failed app mount.';
+    await page.screenshot({ path: 'journey-failure-' + (process.env.DEVICE_PROFILE || 'desktop') + '.png', fullPage: false }).catch(() => {});
   });
   if (report.failedStep) finish(1);
 
@@ -317,7 +331,7 @@ try {
       .waitFor({ state: 'visible', timeout: TIMEOUT_MS })
       .then(() => 'error'),
     page
-      .getByRole('button', { name: /generate my code/i })
+      .getByRole('button', { name: /generate my code|generar mi código/i })
       .first()
       .waitFor({ state: 'hidden', timeout: TIMEOUT_MS })
       .then(() => 'started'),
