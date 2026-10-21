@@ -199,7 +199,9 @@ jobs:
           # 360px phone and a pass on desktop stays legible as "broken only
           # when small" rather than collapsing into one file.
           name: journey-reports
-          path: journey-report-*.json
+          path: |
+            journey-report-*.json
+            journey-failure-*.png
 
   repair:
     needs: check
