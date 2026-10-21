@@ -199,7 +199,9 @@ jobs:
           # 360px phone and a pass on desktop stays legible as "broken only
           # when small" rather than collapsing into one file.
           name: journey-reports
-          path: journey-report-*.json
+          path: |
+            journey-report-*.json
+            journey-failure-*.png
 
   repair:
     needs: check
@@ -223,6 +225,7 @@ jobs:
       contents: write        # to push a branch — NOT to push to main
       pull-requests: write   # to open the PR
       issues: write          # to report a cause that lives outside the repo
+      id-token: write        # Claude action obtains short-lived GitHub OIDC credentials
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
@@ -250,4 +253,8 @@ jobs:
           # A dedicated key, never shared with adversarial-probe.yml or any
           # deployment — so its spend is attributable and it can be revoked
           # on its own. Same reasoning that file already documents.
-          prompt_file: .github/agent-prompts/demo-repair.md
+          prompt: |
+            Read .github/agent-prompts/demo-repair.md in full and follow it exactly.
+            Inspect journey-report-desktop.json, journey-report-galaxy-a10.json,
+            and journey-report-android-tablet.json before changing anything.
+            Do not edit outside the allowlist; create a PR only, never merge.
