@@ -213,6 +213,9 @@ jobs:
     # the job that spends money and holds write permissions, so it does not
     # get the 6-hour default.
     timeout-minutes: 30
+    env:
+      # Secrets are unavailable in `if:` expressions, so expose presence here.
+      HAS_WATCHDOG_KEY: ${{ secrets.WATCHDOG_API_KEY != '' }}
     concurrency:
       # THE constraint this workflow's header promises: never two repair
       # agents at once. `cancel-in-progress: false` so a repair that is
@@ -242,7 +245,12 @@ jobs:
           name: journey-reports
           path: .
 
+      - name: Skip repair (no WATCHDOG_API_KEY)
+        if: env.HAS_WATCHDOG_KEY != 'true'
+        run: echo "::warning::WATCHDOG_API_KEY secret is not set; skipping automated repair."
+
       - name: Repair
+        if: env.HAS_WATCHDOG_KEY == 'true'
         # NOTE: not verifiable from the authoring sandbox (no network to
         # GitHub's action registry). If this action name or version is
         # wrong the job fails loudly at startup rather than silently
