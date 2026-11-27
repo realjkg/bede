@@ -1,3 +1,4 @@
+# Disabled here: the canonical copy runs in agnusdei-ai/bede.
 name: Keep demo backend warm
 
 # Render's free web-service plan (render.yaml) spins the container down
@@ -18,8 +19,6 @@ name: Keep demo backend warm
 # bede-demo-api to Render's paid Starter plan (~$7/mo, no spin-down,
 # no shared-hours ceiling) for true 24/7 coverage instead.
 on:
-  schedule:
-    - cron: '*/10 12-23 * * *'
   workflow_dispatch:
 
 # This job only curls an external URL — no repo write access needed at all.
