@@ -1,3 +1,4 @@
+# Disabled here: the canonical copy runs in agnusdei-ai/bede.
 name: Demo watchdog
 
 # Drives the public demo's real first user journey in a real browser, and
@@ -71,11 +72,6 @@ name: Demo watchdog
 # becomes an unattended agent editing deployment headers for no reason.
 
 on:
-  schedule:
-    # Every 30 minutes. Frequent enough that an outage is caught in one
-    # school period rather than one school day; infrequent enough that a
-    # flapping backend does not open a PR every few minutes.
-    - cron: '7,37 * * * *'
   workflow_dispatch:
     inputs:
       repair:
